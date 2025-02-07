@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { db, storage } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Image, Upload, Sparkles, Send } from 'lucide-react';
 import { cloudinaryConfig } from '@/lib/cloudinary';
 import toast from 'react-hot-toast';
 import { Spinner } from '@/components/ui/spinner';
+import Image from 'next/image';
 
 export default function TeacherDashboard() {
   const [title, setTitle] = useState('');
@@ -155,9 +154,9 @@ export default function TeacherDashboard() {
         <Card className="border-0 bg-gradient-to-r from-zinc-900/90 to-zinc-800/90 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent flex items-center justify-center gap-2">
-              <Sparkles className="w-6 h-6 text-white" />
+              <Image src="/path/to/image1.png" alt="Icon 1" className="w-6 h-6 text-white" />
               Teacher Dashboard
-              <Sparkles className="w-6 h-6 text-white" />
+              <Image src="/path/to/image2.png" alt="Icon 2" className="w-6 h-6 text-white" />
             </CardTitle>
           </CardHeader>
         </Card>
@@ -239,7 +238,7 @@ export default function TeacherDashboard() {
           <Card className="border border-zinc-800 bg-gradient-to-br from-zinc-900/90 to-zinc-800/90 backdrop-blur-sm hover:border-zinc-700 transition-all duration-300 md:col-span-2">
             <CardHeader>
               <CardTitle className="text-lg text-white flex items-center gap-2">
-                <Image className="w-5 h-5" />
+                <Image src="/path/to/image.png" alt="Icon" className="w-5 h-5" />
                 Attach Image
               </CardTitle>
             </CardHeader>
@@ -252,9 +251,11 @@ export default function TeacherDashboard() {
                     </div>
                   ) : imagePreview ? (
                     <div className="absolute inset-0 w-full h-full">
-                      <img
+                      <Image
                         src={imagePreview}
                         alt="Preview"
+                        width={400}
+                        height={300}
                         className="w-full h-full object-contain p-2"
                       />
                       <button
@@ -270,7 +271,7 @@ export default function TeacherDashboard() {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-8 h-8 mb-3 text-zinc-400" />
+                      <Image src="/path/to/placeholder.png" alt="Placeholder" className="w-8 h-8 mb-3 text-zinc-400" />
                       <p className="mb-2 text-sm text-zinc-400">
                         <span className="font-semibold">Click to upload</span> or drag and drop
                       </p>
@@ -295,7 +296,7 @@ export default function TeacherDashboard() {
             type="submit"
             className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-white to-gray-200 text-black rounded-lg font-semibold flex items-center justify-center gap-2 hover:from-red-500 hover:to-orange-500 hover:text-white transition duration-200 shadow-lg hover:shadow-orange-500/20"
           >
-            <Send className="w-5 h-5" />
+            <Image src="/path/to/icon.png" alt="Icon" className="w-5 h-5" />
             Create Post
           </button>
         </form>

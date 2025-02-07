@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -7,12 +7,16 @@ import { getDoc, doc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import Image from 'next/image';
 
+interface LoginFormData {
+  email: string;
+  password: string;
+}
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
-  const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +83,7 @@ export default function Login() {
           </form>
 
           <p className="text-center text-sm text-gray-600">
-            Don't you have an account?{' '}
+            Don&apos;t you have an account?{' '}
             <a href="/auth/register" className="text-[#0B4A2B] font-medium hover:text-[#083920]">
               Sign up
             </a>

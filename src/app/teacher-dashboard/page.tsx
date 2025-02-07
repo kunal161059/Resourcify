@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { PlusCircle, FileText } from "lucide-react";
 import { Button } from "../../components/ui/moving-border";
+import Image from 'next/image';
 
 const TeacherDashboard = () => {
   return (
@@ -17,9 +18,12 @@ const TeacherDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Left Side - Illustration */}
           <div className="order-2 lg:order-1">
-            <img 
-              src="https://thepear.co/assets/images/image01.svg?v=51624eb8"
-              alt="Dashboard Illustration"
+            <Image
+              src="/dashboard-image.jpg"
+              alt="Dashboard overview"
+              width={500}
+              height={300}
+              priority
               className="w-full h-auto rounded-lg shadow-lg"
             />
           </div>

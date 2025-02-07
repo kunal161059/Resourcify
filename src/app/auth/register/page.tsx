@@ -1,9 +1,22 @@
 'use client';
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth, db, verifyTeacherCode } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
+import Image from 'next/image';
+
+interface RegisterFormData {
+  email: string;
+  password: string;
+  username: string;
+  // Add other fields as needed
+}
+
+interface ValidationError {
+  field: string;
+  message: string;
+}
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -13,9 +26,16 @@ export default function Register() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(''); // Clear any existing errors
+
+    const formData = new FormData(e.currentTarget);
+    const data: RegisterFormData = {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+      username: formData.get('username') as string,
+    };
     
     try {
       if (role === 'teacher') {
@@ -27,10 +47,10 @@ export default function Register() {
         }
       }
 
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
 
       await setDoc(doc(db, 'users', userCredential.user.uid), {
-        email,
+        email: data.email,
         role,
         createdAt: new Date(),
         verified: role === 'teacher' ? true : false, // Add verification status
@@ -78,6 +98,11 @@ export default function Register() {
     } catch (error: any) {
       setError(error.message);
     }
+  };
+
+  const handleValidation = (data: RegisterFormData): ValidationError | null => {
+    // Your validation logic
+    return null;
   };
 
   return (
@@ -177,7 +202,12 @@ export default function Register() {
             <span className="text-[#FF6B4E]">With<br />
               EASE.</span>
           </h1>
-          <img src="https://img.freepik.com/free-vector/man-reading-concept-illustration_114360-8515.jpg?t=st=1738366886~exp=1738370486~hmac=84f87edf4409e094af0c526b76f0629ea0bdad76cecfeb9e2b890207b8be25a5&w=740" alt="Coding guy illustration" className="max-w-md mx-auto" />
+          <Image 
+            src="/path-to-image.jpg"
+            alt="Registration"
+            width={500}
+            height={300}
+          />
         </div>
       </div>
     </div>

@@ -5,6 +5,8 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
+import Image from 'next/image';
+import { User } from 'firebase/auth';
 
 type Post = {
   id: string;
@@ -16,9 +18,25 @@ type Post = {
   imageUrl?: string; // Add this for image support
 };
 
+// Define proper interfaces for your data
+interface StudentData {
+  user: User;
+  courses: CourseData[];
+  // Add other specific types
+}
+
+interface CourseData {
+  id: string;
+  title: string;
+  imageUrl?: string;
+  // Add other course properties
+}
+
 export default function StudentDashboard() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [studentData, setStudentData] = useState<StudentData | null>(null);
+  const [courses, setCourses] = useState<CourseData[]>([]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -89,6 +107,34 @@ export default function StudentDashboard() {
               </div>
             </Card>
           </Link>
+        ))}
+      </div>
+      <div>
+        {/* Replace img with Next.js Image */}
+        {studentData?.user?.photoURL && (
+          <Image
+            src={studentData.user.photoURL}
+            alt="Student profile"
+            width={100}
+            height={100}
+            className="rounded-full"
+          />
+        )}
+        
+        {/* If you have other images, replace those too */}
+        {/* Example for course images */}
+        {courses?.map((course: CourseData) => (
+          <div key={course.id}>
+            {course.imageUrl && (
+              <Image
+                src={course.imageUrl}
+                alt={course.title}
+                width={200}  // adjust size as needed
+                height={150} // adjust size as needed
+                className="course-image"  // keep any existing classes
+              />
+            )}
+          </div>
         ))}
       </div>
     </div>

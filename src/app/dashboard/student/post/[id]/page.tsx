@@ -4,22 +4,32 @@ import { useRouter, useParams } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { BackgroundLines } from '@/components/ui/background-lines';
+import Image from 'next/image';
 
-interface Post {
+interface PostData {
   id: string;
   title: string;
   content: string;
-  batch: string;
-  timestamp: any;
-  facultyName: string;
   imageUrl?: string;
+  author: {
+    id: string;
+    name: string;
+    photoURL?: string;
+  };
+  createdAt: string | Date;
+  // add other properties your post contains
 }
 
-export default function PostPage() {
+interface PostParams {
+  params: {
+    id: string;
+  };
+}
+
+const PostPage = ({ params }: PostParams) => {
   const router = useRouter();
-  const params = useParams();
   const postId = params.id as string;
-  const [post, setPost] = useState<Post | null>(null);
+  const [post, setPost] = useState<PostData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -39,7 +49,7 @@ export default function PostPage() {
           const postData = {
             id: docSnap.id,
             ...docSnap.data()
-          } as Post;
+          } as PostData;
           console.log('Post data:', postData);
           setPost(postData);
         } else {
@@ -95,21 +105,35 @@ export default function PostPage() {
             <div className="mb-4">
               <h1 className="text-2xl font-bold text-white text-center">{post.title}</h1>
               <div className="mt-2 flex items-center justify-between text-sm text-gray-300">
-                <p>From: {post.facultyName}</p>
-                <p>{post.timestamp?.toDate().toLocaleString()}</p>
+                <p>From: {post.author.name}</p>
+                <p>{post.createdAt instanceof Date ? post.createdAt.toLocaleString() : new Date(post.createdAt).toLocaleString()}</p>
               </div>
-              <p className="text-sm text-gray-300">Batch: {post.batch}</p>
             </div>
             
             {post.imageUrl && (
               <div className="my-6">
                 <div className="relative w-full h-[400px] rounded-lg overflow-hidden bg-zinc-900/50">
-                  <img
+                  <Image
                     src={post.imageUrl}
                     alt={post.title}
+                    width={800}
+                    height={400}
                     className="w-full h-full object-contain"
+                    priority
                   />
                 </div>
+              </div>
+            )}
+            
+            {post.author.photoURL && (
+              <div className="flex items-center justify-center mt-4">
+                <Image
+                  src={post.author.photoURL}
+                  alt={`${post.author.name}'s profile`}
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                />
               </div>
             )}
             
@@ -121,4 +145,6 @@ export default function PostPage() {
       </div>
     </div>
   );
-}
+};
+
+export default PostPage;

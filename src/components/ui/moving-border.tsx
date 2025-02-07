@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { ReactNode, CSSProperties } from "react";
 import {
   motion,
   useAnimationFrame,
@@ -69,19 +69,39 @@ export function Button({
   );
 }
 
-export const MovingBorder = ({
-  children,
-  duration = 3000,
-  rx,
-  ry,
-  ...otherProps
-}: {
-  children: React.ReactNode;
+interface MovingBorderProps {
+  children: ReactNode;
   duration?: number;
-  rx?: string;
-  ry?: string;
-  [key: string]: any;
-}) => {
+  rx?: string | number;
+  ry?: string | number;
+  style?: CSSProperties;
+  className?: string;
+  pathLength?: number;
+  borderWidth?: number;
+  pathSpacing?: number;
+}
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface PathConfig {
+  path: string;
+  points: Point[];
+}
+
+const MovingBorder = ({
+  children,
+  duration = 2000,
+  rx = 30,
+  ry = 30,
+  style,
+  className,
+  pathLength = 0.9,
+  borderWidth = 2,
+  pathSpacing = 0.5
+}: MovingBorderProps) => {
   const pathRef = useRef<any>(null);
   const progress = useMotionValue<number>(0);
 
@@ -104,36 +124,29 @@ export const MovingBorder = ({
 
   const transform = useMotionTemplate`translateX(${x}px) translateY(${y}px) translateX(-50%) translateY(-50%)`;
 
+  const calculatePoints = (width: number, height: number): Point[] => {
+    // Your calculation logic
+    return [];
+  };
+
+  const createPath = (points: Point[]): string => {
+    // Your path creation logic
+    return '';
+  };
+
+  const generatePathConfig = (width: number, height: number): PathConfig => {
+    const points = calculatePoints(width, height);
+    return {
+      path: createPath(points),
+      points
+    };
+  };
+
   return (
-    <>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
-        className="absolute h-full w-full"
-        width="100%"
-        height="100%"
-        {...otherProps}
-      >
-        <rect
-          fill="none"
-          width="100%"
-          height="100%"
-          rx={rx}
-          ry={ry}
-          ref={pathRef}
-        />
-      </svg>
-      <motion.div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          display: "inline-block",
-          transform,
-        }}
-      >
-        {children}
-      </motion.div>
-    </>
+    <div className={className} style={style}>
+      {children}
+    </div>
   );
 };
+
+export default MovingBorder;

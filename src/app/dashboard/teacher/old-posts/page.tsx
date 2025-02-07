@@ -154,7 +154,6 @@ export default function OldPosts() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const myRef = useRef(null);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -255,10 +254,12 @@ export default function OldPosts() {
                         {/* Add image display */}
                         {post.imageUrl && (
                             <div className="mt-4 relative w-full h-[300px] rounded-lg overflow-hidden">
-                                <img
+                                <Image
                                     src={post.imageUrl}
                                     alt={`Image for ${post.title}`}
                                     className="w-full h-full object-contain bg-black/50"
+                                    width={300}
+                                    height={200}
                                 />
                             </div>
                         )}

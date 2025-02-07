@@ -2,6 +2,7 @@
 import { AuthProvider } from '@/contexts/AuthContext';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
+import { ReactNode } from 'react';
 
 export const metadata = {
   title: 'Academic Portal',
@@ -11,6 +12,10 @@ export const metadata = {
 import React from 'react';
 import { ThemeProvider } from '../ThemeContext';
 
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
 const MyApp = ({ Component, pageProps }: { Component: React.ElementType, pageProps: any }) => {
     return (
         <ThemeProvider>
@@ -19,19 +24,10 @@ const MyApp = ({ Component, pageProps }: { Component: React.ElementType, pagePro
     );
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-        <Toaster position="top-center" />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

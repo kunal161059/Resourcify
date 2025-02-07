@@ -2,12 +2,20 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from 'next/image';
 
 declare global {
     interface Window {
         $crisp: any[];
         CRISP_WEBSITE_ID: string;
     }
+}
+
+interface TestimonialProps {
+  text: string;
+  author: string;
+  role: string;
+  imageUrl: string;
 }
 
 export default function Home() {
@@ -176,10 +184,13 @@ export default function Home() {
 
                 {/* Right Image */}
                 <div className="flex-1 flex justify-end">
-                    <img
+                    <Image
                         src="https://miro.medium.com/v2/resize:fit:828/format:webp/1*hNyuYgUBGxtm9cXtbJSBCQ.png"
                         alt="Education Image"
                         className="w-[600px] h-[600px] object-contain object-center"
+                        width={828}
+                        height={828}
+                        priority
                     />
                 </div>
             </div>
@@ -188,10 +199,12 @@ export default function Home() {
             <div id="motive" className={`px-24 flex items-center justify-between gap-12 ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
                 {/* Image */}
                 <div className="flex-1">
-                    <img
+                    <Image
                         src="https://static.tildacdn.com/tild6563-3832-4461-a239-393437356461/Yuppies_-_Remote_fro.svg"
                         alt="Education Image"
                         className='w-[600px] h-[600px] object-contain object-center'
+                        width={600}
+                        height={600}
                     />
                 </div>
 
