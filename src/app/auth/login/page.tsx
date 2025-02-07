@@ -101,10 +101,11 @@ export default function Login() {
       {/* Right side with image */}
       <div className="w-1/2 relative flex items-center justify-center">
         <Image
-          src="https://reeboard.odoo.com/web_editor/shape/theme_paptic/s_cover.svg?c1=o-color-1&c2=o-color-2"
+          src="/red-illustration.png"
           alt="Decorative leaves"
           width={700}
           height={700}
+
         />
       </div>
     </div>

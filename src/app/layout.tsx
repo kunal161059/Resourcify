@@ -27,7 +27,10 @@ const MyApp = ({ Component, pageProps }: { Component: React.ElementType, pagePro
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster position="top-center" />
+      </body>
     </html>
   );
 }

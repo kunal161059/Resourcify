@@ -2,7 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['your-image-domain.com'], // Add your image domains here
+    domains: [
+      'miro.medium.com',
+      'reeboard.odoo.com',
+      'your-image-domain.com', // Add your image domains here
+      'res.cloudinary.com', // Add Cloudinary domain here
+    ],
   }
 }
 

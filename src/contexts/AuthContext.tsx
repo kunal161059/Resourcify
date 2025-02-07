@@ -2,7 +2,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { auth, db } from '@/lib/firebase';
-import { onAuthStateChanged, User, UserCredential } from 'firebase/auth';
+import { onAuthStateChanged, User, UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
 interface AuthContextType {
@@ -50,6 +50,47 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     return unsubscribe;
   }, []);
+
+  const logout = async () => {
+    if (currentUser) {
+      await auth.signOut();
+      setCurrentUser(null);
+    }
+  };
+
+  const signup = async (email: string, password: string) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      setCurrentUser(userCredential.user);
+      return userCredential;
+    } catch (error) {
+      console.error("Signup error:", error);
+      throw error; // Rethrow the error for handling in the UI
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      setCurrentUser(userCredential.user);
+      return userCredential;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error; // Rethrow the error for handling in the UI
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    // Implement reset password logic
+  };
+
+  const updateEmail = async (email: string) => {
+    // Implement update email logic
+  };
+
+  const updatePassword = async (password: string) => {
+    // Implement update password logic
+  };
 
   const value: AuthContextType = {
     currentUser,

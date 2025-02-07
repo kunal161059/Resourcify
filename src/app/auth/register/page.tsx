@@ -4,13 +4,12 @@ import { useRouter } from 'next/navigation';
 import { auth, db, verifyTeacherCode } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import Image from 'next/image';
+import { FirebaseError } from 'firebase/app';
 
 interface RegisterFormData {
   email: string;
   password: string;
   username: string;
-  // Add other fields as needed
 }
 
 interface ValidationError {
@@ -25,52 +24,42 @@ export default function Register() {
   const [teacherCode, setTeacherCode] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const [username, setUsername] = useState('');
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(''); // Clear any existing errors
+    setError('');
 
-    const formData = new FormData(e.currentTarget);
-    const data: RegisterFormData = {
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-      username: formData.get('username') as string,
-    };
-    
+    if (!email || !password || !username) {
+      setError('All fields are required');
+      return;
+    }
+
     try {
-      if (role === 'teacher') {
-        console.log('Verifying teacher code:', teacherCode); // Debug log
-        const isValidCode = await verifyTeacherCode(teacherCode);
-        if (!isValidCode) {
-          setError(`Invalid teacher verification code. Please check your code and try again.`);
-          return;
-        }
-      }
-
-      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
       await setDoc(doc(db, 'users', userCredential.user.uid), {
-        email: data.email,
+        email,
         role,
+        username,
         createdAt: new Date(),
-        verified: role === 'teacher' ? true : false, // Add verification status
+        verified: role === 'teacher',
       });
 
-      // Redirect based on role
-      if (role === 'teacher') {
-        router.push('/teacher-dashboard'); // Updated path for teacher dashboard
-      } else {
-        router.push('/dashboard/student'); // Assuming this path exists for students
-      }
-    } catch (error: any) {
-      console.error('Registration error:', error); // Debug log
-      setError(error.message);
+      router.push(role === 'teacher' ? '/teacher-dashboard' : '/dashboard/student');
+    } catch (error) {
+      console.error('Full registration error:', error);
+      setError(error instanceof Error ? error.message : 'Registration failed');
     }
   };
 
+
   const handleGoogleSignUp = async () => {
     try {
-      // Verify teacher code if role is teacher
       if (role === 'teacher') {
         const isValidCode = await verifyTeacherCode(teacherCode);
         if (!isValidCode) {
@@ -81,22 +70,26 @@ export default function Register() {
 
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      
+
       await setDoc(doc(db, 'users', result.user.uid), {
         email: result.user.email,
         role: role,
         createdAt: new Date(),
-        verified: role === 'teacher' ? true : false, // Add verification status
+        verified: role === 'teacher',
       });
 
-      // Redirect based on role
-      if (role === 'teacher') {
-        router.push('/teacher-dashboard');
+      router.push(role === 'teacher' ? '/teacher-dashboard' : '/dashboard/student');
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        console.error('Firebase error:', error.code, error.message);
+        setError(error.message);
+      } else if (error instanceof Error) {
+        console.error('Registration error:', error.message);
+        setError(error.message);
       } else {
-        router.push('/dashboard/student');
+        console.error('Unknown registration error:', error);
+        setError('An unexpected error occurred during registration');
       }
-    } catch (error: any) {
-      setError(error.message);
     }
   };
 
@@ -109,12 +102,22 @@ export default function Register() {
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center p-6">
         {/* Form Section */}
-        <div className="bg-[#E8F5F3] p-8 rounded-3xl w-full max-w-md">
+        <div className="bg-[#fff2f1] p-8 rounded-3xl w-full max-w-md">
           <div className="flex items-center gap-2 mb-6">
             <span className="font-semibold text-[#1B4B43] text-4xl">Create new account</span>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-4">
+            <div>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter Your Username"
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#1B4B43] text-gray-600"
+                required
+              />
+            </div>
             <div>
               <input
                 type="email"
@@ -147,7 +150,6 @@ export default function Register() {
               </select>
             </div>
 
-            {/* Add teacher verification code input */}
             {role === 'teacher' && (
               <div>
                 <input
@@ -167,7 +169,7 @@ export default function Register() {
 
             <button
               type="submit"
-              className="w-full bg-[#1B4B43] text-white py-3 rounded-lg hover:bg-[#163b35] transition duration-200"
+              className="w-full bg-[#ffa08d] text-white py-3 rounded-lg hover:bg-[#a1483a] transition duration-200"
             >
               Sign Up
             </button>
@@ -199,11 +201,10 @@ export default function Register() {
           <h1 className="text-5xl font-bold mb-4">
             <span className="text-black">Share</span><br />
             <span className="text-black">Notes</span><br />
-            <span className="text-[#FF6B4E]">With<br />
-              EASE.</span>
+            <span className="text-[#FF6B4E]">With<br />EASE.</span>
           </h1>
-          <Image 
-            src="/path-to-image.jpg"
+          <img
+            src="/redinred.png"
             alt="Registration"
             width={500}
             height={300}

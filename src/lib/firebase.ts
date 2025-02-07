@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where, setDoc, doc, updateDoc } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -9,12 +9,14 @@ import { getStorage } from 'firebase/storage';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  apiKey: "AIzaSyBx3yo-ouQCYBxTn_9xyuxsAfKXSAiT1pY",
+  authDomain: "resourcify-2618e.firebaseapp.com",
+  databaseURL: "https://resourcify-2618e-default-rtdb.firebaseio.com",
+  projectId: "resourcify-2618e",
+  storageBucket: "resourcify-2618e.firebasestorage.app",
+  messagingSenderId: "449014061320",
+  appId: "1:449014061320:web:4182134eb5ca84a4d474bd",
+  measurementId: "G-32M3EQTJ74"
 };
 
 // Initialize Firebase
@@ -35,7 +37,9 @@ export const loginUser = async (email: string, password: string) => {
 
 export const registerUser = async (email: string, password: string, role: 'teacher' | 'student', name: string) => {
   try {
+    console.log('Attempting to register:', { email, role, name });
     const result = await createUserWithEmailAndPassword(auth, email, password);
+    console.log('User created successfully:', result.user.uid);
     
     // Add user profile to Firestore
     await addDoc(collection(db, 'users'), {
@@ -48,6 +52,7 @@ export const registerUser = async (email: string, password: string, role: 'teach
     
     return result.user;
   } catch (error) {
+    console.error('Registration error:', error);
     throw error;
   }
 };
@@ -57,21 +62,30 @@ export const verifyTeacherCode = async (code: string) => {
     const normalizedCode = code.trim().toUpperCase();
     const codesRef = collection(db, 'teacherCodes');
     
-    // Simple query to just check if code exists
-    const querySnapshot = await getDocs(codesRef);
+    // Query for the teacher code that matches our normalized code and is not used
+    const q = query(
+      codesRef,
+      where('code', '==', normalizedCode),
+      where('isUsed', '==', false)
+    );
+    const querySnapshot = await getDocs(q);
     
-    let isValid = false;
-    querySnapshot.forEach(doc => {
-      const data = doc.data();
-      if (data.code === normalizedCode && data.isUsed === false) {
-        isValid = true;
-      }
+    if (querySnapshot.empty) {
+      return false;
+    }
+    
+    // Get the first matching document
+    const matchingDocRef = doc(db, 'teacherCodes', querySnapshot.docs[0].id);
+    
+    // Update just the specific fields without overwriting the entire document
+    await updateDoc(matchingDocRef, {
+      isUsed: true,
+      usedAt: new Date(),
     });
     
-    return isValid;
-    
+    return true;
   } catch (error) {
-    console.error("Verification error:", error);
+    console.error('Verification error:', error);
     return false;
   }
 };

@@ -6,7 +6,6 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { cloudinaryConfig } from '@/lib/cloudinary';
 import toast from 'react-hot-toast';
 import { Spinner } from '@/components/ui/spinner';
-import Image from 'next/image';
 
 export default function TeacherDashboard() {
   const [title, setTitle] = useState('');
@@ -59,14 +58,21 @@ export default function TeacherDashboard() {
   const handlePost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Show loading toast
-    const loadingToast = toast.loading('Creating post...');
+    // Validate required fields
+    if (!title || !content || !facultyName) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    setIsUploading(true);
 
     try {
       let imageUrl = '';
       
       if (image) {
+        // Upload to Cloudinary and get the secure_url
         imageUrl = await uploadImageToCloudinary(image);
+        console.log('Image URL for post:', imageUrl);
       }
 
       // Create post in Firebase
@@ -87,30 +93,19 @@ export default function TeacherDashboard() {
       setImagePreview(null);
       setFacultyName('');
       
-      // Dismiss loading toast and show success
-      toast.dismiss(loadingToast);
-      toast.success('Post created successfully! 🎉', {
-        duration: 5000,
-        style: {
-          background: '#333',
-          color: '#fff',
-          fontSize: '16px',
-          padding: '16px',
-        },
+      // Success notification with more details
+      toast.success('Post created successfully!', {
+        duration: 3000,
+        position: 'top-center',
+        icon: '🎉',
       });
 
     } catch (error) {
       console.error('Error:', error);
-      // Dismiss loading toast and show error
-      toast.dismiss(loadingToast);
+      // Error notification with more details
       toast.error('Failed to create post. Please try again.', {
-        duration: 5000,
-        style: {
-          background: '#333',
-          color: '#fff',
-          fontSize: '16px',
-          padding: '16px',
-        },
+        duration: 4000,
+        position: 'top-center',
       });
     } finally {
       setIsUploading(false);
@@ -154,9 +149,9 @@ export default function TeacherDashboard() {
         <Card className="border-0 bg-gradient-to-r from-zinc-900/90 to-zinc-800/90 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent flex items-center justify-center gap-2">
-              <Image src="/path/to/image1.png" alt="Icon 1" className="w-6 h-6 text-white" />
+              <img src="/star_1527379.png" alt="Icon 1" className="w-6 h-6 text-white" />
               Teacher Dashboard
-              <Image src="/path/to/image2.png" alt="Icon 2" className="w-6 h-6 text-white" />
+              <img src="/star_1527379.png" alt="Icon 2" className="w-6 h-6 text-white" />
             </CardTitle>
           </CardHeader>
         </Card>
@@ -238,7 +233,7 @@ export default function TeacherDashboard() {
           <Card className="border border-zinc-800 bg-gradient-to-br from-zinc-900/90 to-zinc-800/90 backdrop-blur-sm hover:border-zinc-700 transition-all duration-300 md:col-span-2">
             <CardHeader>
               <CardTitle className="text-lg text-white flex items-center gap-2">
-                <Image src="/path/to/image.png" alt="Icon" className="w-5 h-5" />
+                <img src="/clip_16389588.png" alt="Icon" className="w-5 h-5" />
                 Attach Image
               </CardTitle>
             </CardHeader>
@@ -251,11 +246,9 @@ export default function TeacherDashboard() {
                     </div>
                   ) : imagePreview ? (
                     <div className="absolute inset-0 w-full h-full">
-                      <Image
+                      <img
                         src={imagePreview}
                         alt="Preview"
-                        width={400}
-                        height={300}
                         className="w-full h-full object-contain p-2"
                       />
                       <button
@@ -271,7 +264,7 @@ export default function TeacherDashboard() {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Image src="/path/to/placeholder.png" alt="Placeholder" className="w-8 h-8 mb-3 text-zinc-400" />
+                      <img src="/stack_15484688.png" alt="Placeholder" className="w-8 h-8 mb-3 text-zinc-400" />
                       <p className="mb-2 text-sm text-zinc-400">
                         <span className="font-semibold">Click to upload</span> or drag and drop
                       </p>
@@ -296,7 +289,7 @@ export default function TeacherDashboard() {
             type="submit"
             className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-white to-gray-200 text-black rounded-lg font-semibold flex items-center justify-center gap-2 hover:from-red-500 hover:to-orange-500 hover:text-white transition duration-200 shadow-lg hover:shadow-orange-500/20"
           >
-            <Image src="/path/to/icon.png" alt="Icon" className="w-5 h-5" />
+            <img src="/pen-square_10435606.png" alt="Icon" className="w-5 h-5" />
             Create Post
           </button>
         </form>
