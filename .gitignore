@@ -47,5 +47,5 @@ next-env.d.ts
 apphosting.local.yaml
 
 # SSL Certificates
-localhost.key
-localhost.crt
+/ssl/*
+!ssl/.gitkeep
